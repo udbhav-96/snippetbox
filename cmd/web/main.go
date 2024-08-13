@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"snippetbox/internal/models"
-	// "models"
 
 	_"github.com/go-sql-driver/mysql"
 )

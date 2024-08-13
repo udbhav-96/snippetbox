@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"errors"
 	"html/template"
 
+	"snippetbox/internal/models"
 )
 
 func (app *application) Home(w http.ResponseWriter, r *http.Request){
@@ -44,7 +46,18 @@ func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Displaying the specific snippet with ID %d...", id)
+
+	snippet, err := app.snippets.Get(id)
+	if err != nil{
+		if errors.Is(err, models.ErrNoRecord){
+			app.notFound(w)
+		} else{
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	fmt.Fprintf(w, "%+v", snippet)
 }
 
 func (app *application) CreateSnippet(w http.ResponseWriter, r *http.Request){
@@ -54,5 +67,17 @@ func (app *application) CreateSnippet(w http.ResponseWriter, r *http.Request){
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
-	w.Write([]byte("Create a new Snippet..."))
+
+	title := "O snail"
+    content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
+    expires := 7
+
+    id, err := app.snippets.Insert(title, content, expires)
+    if err != nil {
+    	app.serverError(w, err)
+    	return 
+    }
+
+	// w.Write([]byte("Create a new Snippet..."))
+	http.Redirect(w, r, fmt.Sprintf("/view?id=%d", id), http.StatusSeeOther)
 }
