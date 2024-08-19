@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"errors"
-	// "html/template"
+	"html/template"
 
 	"snippetbox/internal/models"
 )
@@ -23,30 +23,34 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	for _,snippet := range snippets {
-		fmt.Fprintf(w, "%+v\n", snippet)
+	// for _,snippet := range snippets {
+	// 	fmt.Fprintf(w, "%+v\n", snippet)
+	// }
+
+	files := []string{
+		"../../ui/html/base.tmpl.html",
+		"../../ui/html/pages/home.tmpl.html",
+		"../../ui/html/partials/nav.tmpl.html",
 	}
 
-	// files := []string{
-	// 	"../../ui/html/base.tmpl.html",
-	// 	"../../ui/html/pages/home.tmpl.html",
-	// 	"../../ui/html/partials/nav.tmpl.html",
-	// }
+	ts, err := template.ParseFiles(files...)
+	if err != nil{
+		app.serverError(w, err)
+		// app.errorLog.Println(err.Error())
+		// http.Error(w, "Internal Server Error1",  500)
+		return
+	}
 
-	// ts, err := template.ParseFiles(files...)
-	// if err != nil{
-	// 	app.serverError(w, err)
-	// 	// app.errorLog.Println(err.Error())
-	// 	// http.Error(w, "Internal Server Error1",  500)
-	// 	return
-	// }
+	data := &templateData{
+		Snippets : snippets,
+	}
 
-	// err = ts.ExecuteTemplate(w, "base", nil)
-	// if err != nil{
-	// 	// app.errorLog.Println(err.Error())
-	// 	// http.Error(w, "Internal Server Error2", 500)
-	// 	app.serverError(w, err)
-	// }
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil{
+		// app.errorLog.Println(err.Error())
+		// http.Error(w, "Internal Server Error2", 500)
+		app.serverError(w, err)
+	}
 }
 
 func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
@@ -67,7 +71,26 @@ func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	fmt.Fprintf(w, "%+v", snippet)
+	files := []string{
+		"../../ui/html/base.tmpl.html",
+		"../../ui/html/partials/nav.tmpl.html",
+		"../../ui/html/pages/view.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil{
+		app.serverError(w, err)
+		return
+	}
+
+	data := &templateData{
+		Snippet: snippet,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil{
+		app.serverError(w, err)
+	}
 }
 
 func (app *application) CreateSnippet(w http.ResponseWriter, r *http.Request){
