@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"errors"
-	"html/template"
+	// "html/template"
 
 	"snippetbox/internal/models"
 )
@@ -27,30 +27,35 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request){
 	// 	fmt.Fprintf(w, "%+v\n", snippet)
 	// }
 
-	files := []string{
-		"../../ui/html/base.tmpl.html",
-		"../../ui/html/pages/home.tmpl.html",
-		"../../ui/html/partials/nav.tmpl.html",
-	}
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
 
-	ts, err := template.ParseFiles(files...)
-	if err != nil{
-		app.serverError(w, err)
-		// app.errorLog.Println(err.Error())
-		// http.Error(w, "Internal Server Error1",  500)
-		return
-	}
+	app.render(w, http.StatusOK, "home.tmpl.html", data)
 
-	data := &templateData{
-		Snippets : snippets,
-	}
+	// files := []string{
+	// 	"../../ui/html/base.tmpl.html",
+	// 	"../../ui/html/pages/home.tmpl.html",
+	// 	"../../ui/html/partials/nav.tmpl.html",
+	// }
 
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil{
-		// app.errorLog.Println(err.Error())
-		// http.Error(w, "Internal Server Error2", 500)
-		app.serverError(w, err)
-	}
+	// ts, err := template.ParseFiles(files...)
+	// if err != nil{
+	// 	app.serverError(w, err)
+	// 	// app.errorLog.Println(err.Error())
+	// 	// http.Error(w, "Internal Server Error1",  500)
+	// 	return
+	// }
+
+	// data := &templateData{
+	// 	Snippets : snippets,
+	// }
+
+	// err = ts.ExecuteTemplate(w, "base", data)
+	// if err != nil{
+	// 	// app.errorLog.Println(err.Error())
+	// 	// http.Error(w, "Internal Server Error2", 500)
+	// 	app.serverError(w, err)
+	// }
 }
 
 func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
@@ -71,26 +76,32 @@ func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	files := []string{
-		"../../ui/html/base.tmpl.html",
-		"../../ui/html/partials/nav.tmpl.html",
-		"../../ui/html/pages/view.tmpl.html",
-	}
+	// files := []string{
+	// 	"../../ui/html/base.tmpl.html",
+	// 	"../../ui/html/partials/nav.tmpl.html",
+	// 	"../../ui/html/pages/view.tmpl.html",
+	// }
 
-	ts, err := template.ParseFiles(files...)
-	if err != nil{
-		app.serverError(w, err)
-		return
-	}
+	// ts, err := template.ParseFiles(files...)
+	// if err != nil{
+	// 	app.serverError(w, err)
+	// 	return
+	// }
 
-	data := &templateData{
-		Snippet: snippet,
-	}
+	// data := &templateData{
+	// 	Snippet: snippet,
+	// }
 
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil{
-		app.serverError(w, err)
-	}
+	// err = ts.ExecuteTemplate(w, "base", data)
+	// if err != nil{
+	// 	app.serverError(w, err)
+	// }
+
+	data := app.newTemplateData(r)
+	data.Snippet = snippet
+
+	app.render(w, http.StatusOK, "view.tmpl.html", data)
+
 }
 
 func (app *application) CreateSnippet(w http.ResponseWriter, r *http.Request){
