@@ -70,7 +70,7 @@ func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
 	params := httprouter.ParamsFromContext(r.Context())
 
 	id, err := strconv.Atoi(params.ByName("id"))
-	if err != nil || id<1{
+	if err != nil || id < 1{
 		app.notFound(w)
 		return
 	}
@@ -79,7 +79,7 @@ func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
 	if err != nil{
 		if errors.Is(err, models.ErrNoRecord){
 			app.notFound(w)
-		} else{
+		} else {
 			app.serverError(w, err)
 		}
 		return
@@ -105,6 +105,7 @@ func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
 	// if err != nil{
 	// 	app.serverError(w, err)
 	// }
+
 
 	data := app.newTemplateData(r)
 	data.Snippet = snippet
@@ -206,6 +207,8 @@ func (app *application) CreateSnippetPost(w http.ResponseWriter, r *http.Request
     	app.serverError(w, err)
     	return 
     }
+
+    app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
 
 	// w.Write([]byte("Create a new Snippet..."))
 	http.Redirect(w, r, fmt.Sprintf("/view/%d", id), http.StatusSeeOther)

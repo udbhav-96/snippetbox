@@ -20,10 +20,12 @@ func (app * application) routes() http.Handler{
 	fileServer := http.FileServer(http.Dir("../../ui/static/"))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	router.HandlerFunc(http.MethodGet, "/", app.Home)
-	router.HandlerFunc(http.MethodGet, "/view/:id", app.ViewSnippet)
-	router.HandlerFunc(http.MethodGet, "/create", app.CreateSnippet)
-	router.HandlerFunc(http.MethodPost, "/create", app.CreateSnippetPost)
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
+
+	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.Home))
+	router.Handler(http.MethodGet, "/view/:id", dynamic.ThenFunc(app.ViewSnippet))
+	router.Handler(http.MethodGet, "/create", dynamic.ThenFunc(app.CreateSnippet))
+	router.Handler(http.MethodPost, "/create", dynamic.ThenFunc(app.CreateSnippetPost))
 
 	
 	// return app.recoverPanic(app.logRequest(secureHeaders(mux))) // old way doing manualy 
