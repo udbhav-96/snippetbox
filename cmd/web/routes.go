@@ -27,6 +27,12 @@ func (app * application) routes() http.Handler{
 	router.Handler(http.MethodGet, "/create", dynamic.ThenFunc(app.CreateSnippet))
 	router.Handler(http.MethodPost, "/create", dynamic.ThenFunc(app.CreateSnippetPost))
 
+	// login & signup routes
+	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignup))
+	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.userSignupPost))
+	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.userLogin))
+	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(app.userLoginPost))
+	router.Handler(http.MethodPost, "/user/logout", dynamic.ThenFunc(app.userLogoutPost))
 	
 	// return app.recoverPanic(app.logRequest(secureHeaders(mux))) // old way doing manualy 
 
