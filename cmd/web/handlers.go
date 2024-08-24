@@ -59,6 +59,11 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request){
 	// }
 }
 
+func (app *application) About(w http.ResponseWriter, r *http.Request){
+	data := app.newTemplateData(r)
+	app.render(w, http.StatusOK, "about.tmpl.html", data)
+}
+
 func (app *application) ViewSnippet(w http.ResponseWriter, r *http.Request){
 	// id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	// if err != nil || id<1{
@@ -284,7 +289,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request){
 
 	err := app.decodePostForm(r, &form)
 	if err != nil {
-		app.clientError(w.http.StatusBadRequest)
+		app.clientError(w, http.StatusBadRequest)
 		return 
 	}
 
@@ -299,7 +304,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	id, err := app.user.Authenticate(form.Email, form.Password)
+	id, err := app.users.Authenticate(form.Email, form.Password)
 	if err != nil{
 		if errors.Is(err, models.ErrInvalidCredentials){
 			form.AddNonFieldError("Email or password is incorrect")
@@ -331,7 +336,7 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
-	app.sessionManager.remove(r.Context(), "authenticatedUserID")
+	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
 	app.sessionManager.Put(r.Context(), "flash", "You've been logged out successfully!")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
